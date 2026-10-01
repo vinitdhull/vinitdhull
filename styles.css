@@ -381,6 +381,7 @@ body { background: var(--paper); }
 .education-list > div > span { font-size: 10px; }
 .education-list p { font-size: 11px; }
 .education-list strong { font-size: 13px; }
+.education-note { margin: 18px 0 0; color: #78827b; font-size: 10px; }
 .contact-section { background: radial-gradient(ellipse at 86% 4%, rgb(81 126 157 / 23%), transparent 32%), #18232c; }
 .contact-section h2 { letter-spacing: -3px; }
 .contact-section .eyebrow { color: #b6c1cb; }
