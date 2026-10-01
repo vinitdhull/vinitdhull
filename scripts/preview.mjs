@@ -7,6 +7,7 @@ const port = Number(process.env.PORT || 4173);
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
+  ".jpg": "image/jpeg",
   ".js": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
 };

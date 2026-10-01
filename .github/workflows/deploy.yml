@@ -9,6 +9,7 @@ on:
       - "styles.css"
       - "main.js"
       - "favicon.svg"
+      - "vinit-dhull.jpg"
       - "scripts/**"
       - "package.json"
       - "package-lock.json"
