@@ -1,0 +1,10 @@
+{
+  "name": "vinitdhull-profile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Professional profile website for Vinit Kumar Dhull",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/preview.mjs"
+  }
+}
