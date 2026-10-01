@@ -1,6 +1,6 @@
 # Vinit Kumar Dhull — profile website
 
-A responsive, static professional profile site built with plain HTML, CSS, and JavaScript. [vinitdhull.teckvini.com](https://vinitdhull.teckvini.com/) is reachable, but currently shows Hostinger's default page until the deployment workflow is configured and run.
+A responsive, static professional profile site built with plain HTML, CSS, and JavaScript. The website files live at the repository root so Hostinger's GitHub deployment can serve `index.html` directly from the configured document root.
 
 ## Run locally
 
@@ -16,18 +16,7 @@ Open `http://localhost:4173`.
 
 ## Automatic deployment
 
-Pushing website changes to `main` builds `dist/` and deploys it to the configured Hostinger FTP directory. The workflow can also be started manually from **Actions → Build and deploy profile website → Run workflow**.
-
-Add these repository secrets in **Settings → Secrets and variables → Actions** before running the deploy workflow:
-
-| Secret | Value |
-| --- | --- |
-| `FTP_SERVER` | Hostinger FTP hostname |
-| `FTP_USERNAME` | FTP account username |
-| `FTP_PASSWORD` | FTP account password |
-| `FTP_SERVER_DIR` | FTP path to the `vinitdhull.teckvini.com` document root, with a trailing slash |
-
-Find the subdomain document root in Hostinger hPanel under **Domains → Subdomains**. The workflow deliberately requires the exact path instead of assuming the subdomain shares a directory with the main site.
+Hostinger's GitHub integration deploys the repository root to the configured hosting directory. Ensure the integration is connected to this repository's `main` branch and targets the intended subdomain's document root (for example, `public_html`). The root `index.html`, `styles.css`, `main.js`, and `favicon.svg` are ready to serve directly. GitHub Actions validates the static build; it does not upload files over FTP.
 
 ## Profile content
 
