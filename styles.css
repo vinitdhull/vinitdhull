@@ -213,6 +213,10 @@ h1, h2 { letter-spacing: -2.8px; }
 .project-card.has-image { padding-top: 18px; }
 .project-preview-image { display: block; width: 100%; height: 132px; margin: 16px 0 14px; border-radius: 9px; object-fit: cover; object-position: center 43%; }
 .project-card.has-image h3 { margin-top: 0; }
+.project-product-visual { height: 120px; display: grid; place-items: center; margin: 15px 0 14px; overflow: hidden; border: 1px solid rgb(32 37 31 / 5%); border-radius: 10px; background: linear-gradient(135deg, #f4f4ed, #e9eee6); }
+.project-product-visual img { display: block; width: 100%; height: 100%; padding: 10px; object-fit: contain; }
+.project-product-visual + .project-icon { display: none; }
+.project-product-visual ~ h3 { margin-top: 0; }
 .apps-section { padding: 94px 0 100px; background: #f8f8f4; }
 .app-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
 .app-card { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: start; gap: 17px; min-height: 182px; padding: 19px; border: 1px solid #e3e5dd; border-radius: 13px; background: #fff; box-shadow: 0 5px 18px rgb(32 37 31 / 3%); transition: transform .22s ease, box-shadow .22s ease; }
@@ -344,6 +348,7 @@ h1, h2 { letter-spacing: -2.8px; }
   .project-link, .project-year { left: 19px; }
   .project-card.has-image { padding-top: 17px; }
   .project-preview-image { height: 150px; margin-top: 14px; }
+  .project-product-visual { height: 135px; margin-top: 14px; }
   .apps-section { padding: 71px 0 75px; }
   .app-grid { gap: 10px; }
   .app-card { grid-template-columns: 64px minmax(0, 1fr); gap: 13px; min-height: 0; padding: 15px; }
