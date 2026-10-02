@@ -9,5 +9,8 @@ await Promise.all(
     cp(new URL(`../${file}`, import.meta.url), new URL(`../dist/${file}`, import.meta.url)),
   ),
 );
+await cp(new URL("../assets/", import.meta.url), new URL("../dist/assets/", import.meta.url), {
+  recursive: true,
+});
 
 console.log("Built static site in dist/");
