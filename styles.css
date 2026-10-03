@@ -79,22 +79,13 @@ h1, h2, h3 { font-family: var(--display); }
     linear-gradient(120deg, #151d1e 0%, #1d292b 54%, #243338 100%);
   color: #fff;
 }
-.hero::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background-image: linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px);
-  background-size: 58px 58px;
-  content: "";
-  mask-image: linear-gradient(90deg, transparent, #000 100%);
-}
 .hero-copy { z-index: 1; max-width: 580px; }
 .eyebrow { margin: 0 0 20px; color: #737c72; font-size: 10px; font-weight: 700; letter-spacing: 1.45px; line-height: 1.7; }
 .hero .eyebrow { color: #bec8c2; }
 .status-dot { display: inline-block; width: 7px; height: 7px; margin: 0 9px 1px 0; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px rgb(185 231 122 / 12%); }
 h1, h2 { letter-spacing: -2.8px; }
 .hero h1 { margin: 0 0 20px; font-size: clamp(61px, 7.4vw, 94px); font-weight: 650; line-height: .99; letter-spacing: -6px; }
-.hero h1 span { color: transparent; background: linear-gradient(100deg, #c6ee8a, #a5cde7); background-clip: text; -webkit-background-clip: text; }
+.hero h1 span { color: #c6ee8a; }
 .hero-role { margin-bottom: 17px; color: #e0e7e3; font-size: 14px; font-weight: 600; }
 .hero-intro { max-width: 490px; margin-bottom: 27px; color: #bdc8c3; font-size: 14px; line-height: 1.9; }
 .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 25px; }
@@ -310,7 +301,7 @@ h1, h2 { letter-spacing: -2.8px; }
   html { scroll-padding-top: 76px; }
   .container { width: min(100% - 40px, 540px); }
   .nav { min-height: 68px; }
-  .menu-toggle { width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid #d6d9d1; border-radius: 50%; background: transparent; cursor: pointer; }
+  .menu-toggle { width: 44px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid #d6d9d1; border-radius: 50%; background: transparent; cursor: pointer; }
   .menu-toggle span { width: 17px; height: 1.5px; background: var(--ink); transition: transform .2s ease; }
   .menu-toggle[aria-expanded="true"] span:first-child { transform: translateY(3.25px) rotate(45deg); }
   .menu-toggle[aria-expanded="true"] span:last-child { transform: translateY(-3.25px) rotate(-45deg); }

@@ -10,10 +10,14 @@ on:
       - "main.js"
       - "favicon.svg"
       - "vinit-dhull.jpg"
+      - "assets/**"
       - "scripts/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/deploy.yml"
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:

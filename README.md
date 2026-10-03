@@ -20,4 +20,4 @@ Hostinger's GitHub integration deploys the repository root to the configured hos
 
 ## Profile content
 
-The biography, experience, education, and project summaries are based on the supplied resume, founder information, and public project pages. LinkedIn blocks automated profile access, so LinkedIn details have not been independently verified. Personal identification details and home address from the resume are intentionally not published.
+The biography, experience, education, and project summaries are based on the supplied resume versions, founder information, and public project pages. LinkedIn blocks automated profile access, so LinkedIn details have not been independently verified. Personal identification details and home address from the resumes are intentionally not published.
