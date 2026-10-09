@@ -1,5 +1,5 @@
 /**
- * VINIT KUMAR DHULL — INTERACTION & 3D MOTION SYSTEM
+ * VINIT KUMAR DHULL — COMPLETE 3D INTERACTION & MOTION SYSTEM
  * Senior Technology Leadership Portfolio
  */
 
@@ -129,7 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
     observedSections.forEach((section) => sectionObserver.observe(section));
   }
 
-  // 6. Interactive Projects Carousel
+  // Motion Detection
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  // 6. Interactive Projects Carousel with 3D Cover Flow Physics
   const carouselTrack = document.querySelector("#projects-carousel");
   const prevBtn = document.querySelector("#carousel-prev");
   const nextBtn = document.querySelector("#carousel-next");
@@ -146,6 +150,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const firstSlide = slides[0];
       const gap = 20;
       return firstSlide ? firstSlide.offsetWidth + gap : 360;
+    }
+
+    // 3D Perspective Cover Flow Rotation Function
+    function update3DCarouselTransforms() {
+      if (reduceMotion) return;
+      const trackRect = carouselTrack.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width * 0.5;
+
+      slides.forEach((slide) => {
+        const slideRect = slide.getBoundingClientRect();
+        const slideCenter = slideRect.left + slideRect.width * 0.5;
+        const offset = (slideCenter - trackCenter) / (trackRect.width * 0.5);
+
+        // Calculate 3D perspective angles & scales
+        const rotateY = Math.max(-22, Math.min(22, -offset * 18));
+        const translateZ = Math.max(-80, Math.min(20, (1 - Math.abs(offset)) * 22 - Math.abs(offset) * 44));
+        const scale = Math.max(0.88, Math.min(1.02, 1 - Math.abs(offset) * 0.08));
+        const opacity = Math.max(0.55, Math.min(1, 1 - Math.abs(offset) * 0.25));
+
+        slide.style.transform = `perspective(1200px) rotateY(${rotateY.toFixed(2)}deg) translateZ(${translateZ.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+        slide.style.opacity = opacity.toFixed(3);
+      });
     }
 
     function updateCarouselStatus() {
@@ -172,6 +198,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (nextBtn) {
         nextBtn.disabled = scrollLeft >= maxScroll - 10;
       }
+
+      // Update 3D Cover Flow geometry
+      update3DCarouselTransforms();
     }
 
     if (prevBtn) {
@@ -264,9 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 8. Motion & Scroll-triggered reveals
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-
   if (!reduceMotion && "IntersectionObserver" in window) {
     document.documentElement.classList.add("js-ready");
 
@@ -311,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 9. 3D HERO ARCHITECTURAL CONSTELLATION & TOPOLOGY CANVAS
+  // 9. 3D HERO ARCHITECTURAL CONSTELLATION & CYBERNETIC TERRAIN CANVAS
   // =========================================================================
   function initHero3DCanvas() {
     const canvas = document.querySelector("#hero-3d-canvas");
@@ -326,7 +352,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let isVisible = true;
     let animationFrameId = null;
 
-    // Mouse Tracking with Inertia
     let mouseX = 0;
     let mouseY = 0;
     let targetRotX = 0;
@@ -334,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentRotX = 0;
     let currentRotY = 0;
 
-    // 3D Nodes Generation (Distributed in 3D Architectural Shell)
+    // 3D Nodes Generation
     const NODE_COUNT = 48;
     const nodes = [];
     for (let i = 0; i < NODE_COUNT; i++) {
@@ -346,21 +371,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       nodes.push({
         x: radius * Math.sin(phi) * Math.cos(theta),
-        y: (radius * Math.sin(phi) * Math.sin(theta)) * 0.75, // Elliptical flattening
+        y: (radius * Math.sin(phi) * Math.sin(theta)) * 0.72,
         z: radius * Math.cos(phi),
         baseRadius: 2.2 + Math.random() * 2.5,
         pulseOffset: Math.random() * Math.PI * 2,
-        speed: 0.008 + Math.random() * 0.012,
       });
     }
 
-    // Dynamic 3D Packets traveling between nodes
+    // Dynamic 3D Packets
     const packets = [];
     const MAX_PACKETS = 8;
     function spawnPacket() {
       if (packets.length >= MAX_PACKETS) return;
       const fromIdx = Math.floor(Math.random() * nodes.length);
-      // Find nearby node
       const fromNode = nodes[fromIdx];
       let closestIdx = -1;
       let minD = 170;
@@ -437,11 +460,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       time += 0.016;
 
-      // Smooth Inertia LERP
       currentRotY += (targetRotY - currentRotY) * 0.04;
       currentRotX += (targetRotX - currentRotX) * 0.04;
 
-      // Base idle rotation + interactive orbit
       const autoRotY = time * 0.15;
       const rotY = autoRotY + currentRotY;
       const rotX = 0.25 + currentRotX;
@@ -453,8 +474,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       ctx.clearRect(0, 0, width, height);
 
-      const cx = width * 0.58; // Center aligned towards visual hero balance
-      const cy = height * 0.5;
+      const cx = width * 0.58;
+      const cy = height * 0.48;
       const fov = 420;
 
       // Project all nodes
@@ -462,13 +483,11 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
 
-        // 3D Rotation matrices (Yaw + Pitch)
         const x1 = n.x * cosY + n.z * sinY;
         const z1 = -n.x * sinY + n.z * cosY;
         const y1 = n.y * cosX - z1 * sinX;
         const z2 = n.y * sinX + z1 * cosX;
 
-        // Perspective projection
         const depth = z2 + 350;
         const scale = depth > 0 ? fov / (fov + depth) : 0;
         const px = cx + x1 * scale;
@@ -486,7 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // Draw Connections (Edges) with 3D Depth
+      // Draw Connections (Edges)
       ctx.lineWidth = 1;
       const maxConnectDist = 135;
       for (let i = 0; i < nodes.length; i++) {
@@ -512,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Spawn & Update Packets
+      // Packets
       if (Math.random() < 0.08) spawnPacket();
       for (let p = packets.length - 1; p >= 0; p--) {
         const pkt = packets[p];
@@ -528,7 +547,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const curY = p1.y + (p2.y - p1.y) * pkt.progress;
         const pAlpha = Math.min(p1.alpha, p2.alpha) * 0.9;
 
-        // Glowing packet head
         ctx.fillStyle = `rgba(255, 255, 255, ${pAlpha})`;
         ctx.beginPath();
         ctx.arc(curX, curY, 2.2, 0, Math.PI * 2);
@@ -540,23 +558,56 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fill();
       }
 
-      // Draw Nodes
+      // Nodes
       for (let i = 0; i < projected.length; i++) {
         const p = projected[i];
         if (p.alpha <= 0) continue;
 
-        // Outer glow
         const glowRad = p.radius * (1.6 + p.pulse * 0.8);
         ctx.fillStyle = `rgba(37, 99, 235, ${p.alpha * 0.35})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, glowRad, 0, Math.PI * 2);
         ctx.fill();
 
-        // Core dot
         ctx.fillStyle = `rgba(147, 197, 253, ${p.alpha * 0.85})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // Undulating Cybernetic Terrain Horizon in lower 3D plane
+      const GRID_ROWS = 7;
+      const GRID_COLS = 12;
+      const SPACING_X = 54;
+      const SPACING_Z = 45;
+
+      for (let r = 0; r < GRID_ROWS; r++) {
+        ctx.strokeStyle = `rgba(37, 99, 235, ${(r / GRID_ROWS) * 0.16})`;
+        ctx.beginPath();
+        let first = true;
+
+        for (let c = 0; c <= GRID_COLS; c++) {
+          const gx = (c - GRID_COLS / 2) * SPACING_X;
+          const gz = 60 + r * SPACING_Z;
+          const waveY = Math.sin(gx * 0.015 + time * 1.5) * Math.cos(gz * 0.018 + time) * 14 + 140;
+
+          const x1 = gx * cosY + gz * sinY;
+          const z1 = -gx * sinY + gz * cosY;
+          const y1 = waveY * cosX - z1 * sinX;
+          const z2 = waveY * sinX + z1 * cosX;
+
+          const scale = fov / (fov + z2 + 350);
+          const px = cx + x1 * scale;
+          const py = cy + y1 * scale;
+
+          if (first) {
+            ctx.moveTo(px, py);
+            first = false;
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+        ctx.stroke();
       }
 
       animationFrameId = window.requestAnimationFrame(renderLoop);
@@ -602,7 +653,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", resize, { passive: true });
     resize();
 
-    // Mouse & Touch Orbit Controls
     const container = canvas.parentElement;
     container.addEventListener("pointerdown", (e) => {
       isDragging = true;
@@ -628,12 +678,10 @@ document.addEventListener("DOMContentLoaded", () => {
     container.addEventListener("pointerup", endDrag);
     container.addEventListener("pointercancel", endDrag);
 
-    // Hover effect
     container.addEventListener("pointerenter", () => {
       if (!isDragging) targetRotY += 0.2;
     });
 
-    // 3 Architecture Tiers Definition
     const tiers = [
       {
         name: "API GATEWAY LAYER",
@@ -661,7 +709,6 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     ];
 
-    // Data flow packets moving up/down the pipeline
     const streamPackets = [
       { tierFrom: 0, tierTo: 1, progress: 0.1, speed: 0.02 },
       { tierFrom: 0, tierTo: 1, progress: 0.6, speed: 0.022 },
@@ -671,7 +718,6 @@ document.addEventListener("DOMContentLoaded", () => {
       { tierFrom: 1, tierTo: 0, progress: 0.7, speed: -0.022 },
     ];
 
-    // Visibility Observer
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver((entries) => {
         isVisible = entries[0].isIntersecting;
@@ -692,7 +738,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       time += 0.016;
       if (!isDragging) {
-        targetRotY += 0.006; // Continuous subtle orbit
+        targetRotY += 0.006;
       }
 
       rotY += (targetRotY - rotY) * 0.08;
@@ -723,7 +769,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
 
-      // Draw Vertical Connecting Architecture Stems
+      // Vertical Stems
       for (let a = 0; a < 4; a++) {
         const angle = (a * Math.PI) / 2;
         const r = 50;
@@ -739,7 +785,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.setLineDash([]);
       }
 
-      // Render 3 Tiers (Back to Front or Bottom to Top)
+      // Render Tiers
       tiers.forEach((tier) => {
         const vertices = [];
         for (let i = 0; i < tier.nodes; i++) {
@@ -749,7 +795,6 @@ document.addEventListener("DOMContentLoaded", () => {
           vertices.push(project3D(vx, tier.y, vz));
         }
 
-        // Draw Platform Ring
         ctx.strokeStyle = tier.color;
         ctx.lineWidth = 1.5;
         ctx.fillStyle = tier.glow;
@@ -763,7 +808,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fill();
         ctx.stroke();
 
-        // Draw Nodes on Ring
         vertices.forEach((v) => {
           ctx.fillStyle = "#ffffff";
           ctx.beginPath();
@@ -771,7 +815,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.fill();
         });
 
-        // Center Pillar Node
         const centerP = project3D(0, tier.y, 0);
         ctx.fillStyle = tier.color;
         ctx.beginPath();
@@ -779,7 +822,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fill();
       });
 
-      // Render Animated Transaction Packets
+      // Animated Packets
       streamPackets.forEach((pkt) => {
         pkt.progress += pkt.speed;
         if (pkt.progress >= 1) pkt.progress = 0;
@@ -808,7 +851,323 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 11. ADVANCED MULTI-LAYER 3D TILT, SPECULAR GLARE & HOLOGRAPHIC PARALLAX
+  // 11. 3D GEOSPATIAL DEFENSE DEPLOYMENT GLOBE (ITBP & E-GOV)
+  // =========================================================================
+  function initGlobe3DCanvas() {
+    const canvas = document.querySelector("#globe-3d-canvas");
+    if (!canvas || reduceMotion) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let isVisible = true;
+    let animationFrameId = null;
+
+    let rotY = 1.1;
+    let rotX = 0.35;
+    let targetRotY = 1.1;
+    let targetRotX = 0.35;
+    let isDragging = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+
+    const container = canvas.parentElement;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.scale(dpr, dpr);
+    }
+
+    window.addEventListener("resize", resize, { passive: true });
+    resize();
+
+    // Mouse & Touch Orbit Controls
+    container.addEventListener("pointerdown", (e) => {
+      isDragging = true;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      container.setPointerCapture(e.pointerId);
+    });
+
+    container.addEventListener("pointermove", (e) => {
+      if (isDragging) {
+        const dx = e.clientX - lastPointerX;
+        const dy = e.clientY - lastPointerY;
+        targetRotY += dx * 0.012;
+        targetRotX = Math.max(-0.8, Math.min(0.8, targetRotX + dy * 0.012));
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+      }
+    });
+
+    function endDrag() {
+      isDragging = false;
+    }
+    container.addEventListener("pointerup", endDrag);
+    container.addEventListener("pointercancel", endDrag);
+
+    const GLOBE_RADIUS = 76;
+
+    // Pan-India Geospatial Nodes
+    const locations = [
+      { name: "New Delhi (HQ)", lat: 28.6, lon: 77.2, isHQ: true },
+      { name: "Ladakh (NW)", lat: 34.2, lon: 77.5, isHQ: false },
+      { name: "Uttarakhand (Joshimath)", lat: 30.5, lon: 79.5, isHQ: false },
+      { name: "Arunachal (NE)", lat: 27.5, lon: 93.6, isHQ: false },
+      { name: "Chandigarh Hub", lat: 30.7, lon: 76.7, isHQ: false },
+      { name: "Guwahati Hub", lat: 26.1, lon: 91.7, isHQ: false },
+    ];
+
+    function latLonTo3D(lat, lon, radius) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+      return {
+        x: -(radius * Math.sin(phi) * Math.cos(theta)),
+        y: radius * Math.cos(phi),
+        z: radius * Math.sin(phi) * Math.sin(theta),
+      };
+    }
+
+    const geoNodes = locations.map((loc) => ({
+      ...loc,
+      pos: latLonTo3D(loc.lat, loc.lon, GLOBE_RADIUS),
+    }));
+
+    const hqNode = geoNodes[0];
+    const arcs = [];
+    for (let i = 1; i < geoNodes.length; i++) {
+      arcs.push({
+        target: geoNodes[i],
+        progress: Math.random(),
+        speed: 0.015 + Math.random() * 0.012,
+      });
+    }
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible && !animationFrameId) {
+          renderGlobe();
+        }
+      }, { threshold: 0.05 });
+      observer.observe(container);
+    }
+
+    let time = 0;
+
+    function renderGlobe() {
+      if (!isVisible) {
+        animationFrameId = null;
+        return;
+      }
+
+      time += 0.016;
+      if (!isDragging) {
+        targetRotY += 0.007;
+      }
+
+      rotY += (targetRotY - rotY) * 0.08;
+      rotX += (targetRotX - rotX) * 0.08;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width * 0.5;
+      const cy = height * 0.5;
+      const fov = 320;
+
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
+
+      function project(x, y, z) {
+        const x1 = x * cosY + z * sinY;
+        const z1 = -x * sinY + z * cosY;
+        const y1 = y * cosX - z1 * sinX;
+        const z2 = y * sinX + z1 * cosX;
+        const scale = fov / (fov + z2 + 200);
+        return {
+          x: cx + x1 * scale,
+          y: cy + y1 * scale,
+          z: z2,
+          scale,
+          visible: z2 > -GLOBE_RADIUS * 0.25,
+        };
+      }
+
+      // Atmospheric Rim Glow
+      const glowGrad = ctx.createRadialGradient(cx, cy, GLOBE_RADIUS * 0.6, cx, cy, GLOBE_RADIUS * 1.25);
+      glowGrad.addColorStop(0, "rgba(37, 99, 235, 0.0)");
+      glowGrad.addColorStop(0.8, "rgba(37, 99, 235, 0.12)");
+      glowGrad.addColorStop(1, "rgba(56, 189, 248, 0.0)");
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, GLOBE_RADIUS * 1.25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outer Silhouette Rim
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, GLOBE_RADIUS, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Latitude Rings
+      const LAT_STEPS = 6;
+      for (let i = 1; i < LAT_STEPS; i++) {
+        const lat = -60 + (120 / LAT_STEPS) * i;
+        const radLat = lat * (Math.PI / 180);
+        const r = GLOBE_RADIUS * Math.cos(radLat);
+        const y = GLOBE_RADIUS * Math.sin(radLat);
+
+        ctx.strokeStyle = "rgba(59, 130, 246, 0.14)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        let started = false;
+        const SEGMENTS = 36;
+        for (let j = 0; j <= SEGMENTS; j++) {
+          const theta = (j / SEGMENTS) * Math.PI * 2;
+          const p = project(Math.cos(theta) * r, y, Math.sin(theta) * r);
+          if (p.visible) {
+            if (!started) {
+              ctx.moveTo(p.x, p.y);
+              started = true;
+            } else {
+              ctx.lineTo(p.x, p.y);
+            }
+          } else {
+            started = false;
+          }
+        }
+        ctx.stroke();
+      }
+
+      // Longitude Meridians
+      const LON_STEPS = 10;
+      for (let i = 0; i < LON_STEPS; i++) {
+        const lon = (i / LON_STEPS) * Math.PI;
+        ctx.strokeStyle = "rgba(59, 130, 246, 0.14)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        let started = false;
+        const SEGMENTS = 36;
+        for (let j = 0; j <= SEGMENTS; j++) {
+          const latAngle = (j / SEGMENTS) * Math.PI * 2;
+          const p = project(
+            Math.sin(latAngle) * Math.cos(lon) * GLOBE_RADIUS,
+            Math.cos(latAngle) * GLOBE_RADIUS,
+            Math.sin(latAngle) * Math.sin(lon) * GLOBE_RADIUS,
+          );
+          if (p.visible) {
+            if (!started) {
+              ctx.moveTo(p.x, p.y);
+              started = true;
+            } else {
+              ctx.lineTo(p.x, p.y);
+            }
+          } else {
+            started = false;
+          }
+        }
+        ctx.stroke();
+      }
+
+      // Project Nodes
+      const projectedNodes = geoNodes.map((gn) => ({
+        ...gn,
+        proj: project(gn.pos.x, gn.pos.y, gn.pos.z),
+      }));
+
+      // Ballistic 3D Arcs
+      const projHQ = projectedNodes[0].proj;
+      arcs.forEach((arc) => {
+        arc.progress += arc.speed;
+        if (arc.progress >= 1) arc.progress = 0;
+
+        const targetP = project(arc.target.pos.x, arc.target.pos.y, arc.target.pos.z);
+        if (projHQ.visible || targetP.visible) {
+          const midX = (hqNode.pos.x + arc.target.pos.x) * 0.5;
+          const midY = (hqNode.pos.y + arc.target.pos.y) * 0.5;
+          const midZ = (hqNode.pos.z + arc.target.pos.z) * 0.5;
+          const len = Math.sqrt(midX * midX + midY * midY + midZ * midZ);
+          const arcElevation = GLOBE_RADIUS * 1.35;
+          const elevatedMid = {
+            x: (midX / len) * arcElevation,
+            y: (midY / len) * arcElevation,
+            z: (midZ / len) * arcElevation,
+          };
+          const projMid = project(elevatedMid.x, elevatedMid.y, elevatedMid.z);
+
+          ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+          ctx.lineWidth = 1.2;
+          ctx.setLineDash([2, 3]);
+          ctx.beginPath();
+          ctx.moveTo(projHQ.x, projHQ.y);
+          ctx.quadraticCurveTo(projMid.x, projMid.y, targetP.x, targetP.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const t = arc.progress;
+          const curX = (1 - t) * (1 - t) * projHQ.x + 2 * (1 - t) * t * projMid.x + t * t * targetP.x;
+          const curY = (1 - t) * (1 - t) * projHQ.y + 2 * (1 - t) * t * projMid.y + t * t * targetP.y;
+
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(curX, curY, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "rgba(56, 189, 248, 0.5)";
+          ctx.beginPath();
+          ctx.arc(curX, curY, 5.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Nodes
+      projectedNodes.forEach((node) => {
+        const p = node.proj;
+        if (!p.visible) return;
+
+        if (node.isHQ) {
+          const pulseR = 4 + (Math.sin(time * 4) * 0.5 + 0.5) * 8;
+          ctx.strokeStyle = "rgba(56, 189, 248, 0.6)";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, pulseR, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(56, 189, 248, 1)";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = "#34d399";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      animationFrameId = window.requestAnimationFrame(renderGlobe);
+    }
+
+    renderGlobe();
+  }
+
+  // =========================================================================
+  // 12. ADVANCED MULTI-LAYER 3D TILT, SPECULAR GLARE & HOLOGRAPHIC PARALLAX
   // =========================================================================
   function initAdvanced3DTilt() {
     if (reduceMotion || !finePointer) return;
@@ -816,7 +1175,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const tiltCards = document.querySelectorAll("[data-tilt]");
 
     tiltCards.forEach((card) => {
-      // Invert / inject 3D specular glare overlay if not present
       if (!card.querySelector(".tilt-glare-wrap")) {
         const glareWrap = document.createElement("div");
         glareWrap.className = "tilt-glare-wrap";
@@ -852,7 +1210,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Smooth LERP
         currentRotX += (targetRotX - currentRotX) * 0.12;
         currentRotY += (targetRotY - currentRotY) * 0.12;
 
@@ -867,12 +1224,10 @@ document.addEventListener("DOMContentLoaded", () => {
             frame.style.transform = `perspective(1000px) rotateY(${currentRotY * 14}deg) rotateX(${-currentRotX * 12}deg) translateZ(10px)`;
           }
 
-          // Counter-depth Parallax on Portrait
           if (photo) {
             photo.style.transform = `translate3d(${-currentRotY * 18}px, ${currentRotX * 14}px, 0) scale(1.06)`;
           }
 
-          // Independent Multi-Plane Depth on Floating Chips
           if (chipUpper) {
             chipUpper.style.transform = `translate3d(${currentRotY * 26}px, ${-currentRotX * 20}px, 45px)`;
           }
@@ -904,7 +1259,6 @@ document.addEventListener("DOMContentLoaded", () => {
         targetRotX = (mouseY - 0.5) * 2;
         targetRotY = (mouseX - 0.5) * 2;
 
-        // Move Specular Glare
         if (glareLayer) {
           glareLayer.style.transform = `translate(${(mouseX - 0.5) * 120}%, ${(mouseY - 0.5) * 120}%) translate(-50%, -50%)`;
         }
@@ -920,7 +1274,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 12. 3D MAGNETIC INTERACTIVE BUTTONS
+  // 13. 3D MAGNETIC INTERACTIVE BUTTONS
   // =========================================================================
   function initMagneticButtons() {
     if (reduceMotion || !finePointer) return;
@@ -940,7 +1294,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const x = e.clientX - bounds.left - bounds.width / 2;
         const y = e.clientY - bounds.top - bounds.height / 2;
 
-        // 3D Magnetic displacement
         btn.style.transform = `translate3d(${x * 0.28}px, ${y * 0.28}px, 8px) rotateX(${-y * 0.08}deg) rotateY(${x * 0.08}deg)`;
       });
 
@@ -954,6 +1307,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize All 3D Motion Subsystems
   initHero3DCanvas();
   initSBI3DCanvas();
+  initGlobe3DCanvas();
   initAdvanced3DTilt();
   initMagneticButtons();
 });
