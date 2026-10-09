@@ -565,6 +565,16 @@ ul, ol {
   border-bottom: 1px solid var(--border-dark-hairline);
 }
 
+.hero-3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
 .hero-grid-pattern {
   position: absolute;
   inset: 0;
@@ -1369,6 +1379,63 @@ ul, ol {
 
 .schematic-body {
   padding: 24px;
+}
+
+.schematic-3d-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.12) 0%, rgba(7, 11, 17, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  margin-bottom: 22px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.6);
+}
+
+.schematic-3d-container:active {
+  cursor: grabbing;
+}
+
+.schematic-3d-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.canvas-3d-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--accent-sky);
+  background: rgba(11, 17, 25, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-sky);
+  animation: pulseHint 2s infinite ease-in-out;
+}
+
+@keyframes pulseHint {
+  0%, 100% { opacity: 0.35; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 .schematic-stat {
@@ -2750,6 +2817,109 @@ ul, ol {
   transform: translateY(0);
 }
 
+/* ==========================================================================
+   ADVANCED 3D DEPTH, DYNAMIC GLARE & MAGNETIC MOTION
+   ========================================================================== */
+
+/* Dynamic 3D Specular Glare Overlay */
+.tilt-glare-wrap {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.tilt-glare-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250%;
+  height: 250%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 65%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms ease-out;
+}
+
+/* 3D Perspective Preservation on Tilt Cards */
+[data-tilt] {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+[data-tilt] > * {
+  transform-style: preserve-3d;
+}
+
+/* Internal 3D Floating Layers */
+[data-tilt] .case-title,
+[data-tilt] .editorial-card-title,
+[data-tilt] .pillar-card h3,
+[data-tilt] .app-name,
+[data-tilt] .dossier-card h3 {
+  transform: translateZ(26px);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-tilt] .tech-badge,
+[data-tilt] .card-tech-badges,
+[data-tilt] .pillar-icon-box,
+[data-tilt] .project-card-symbol,
+[data-tilt] .app-icon-frame {
+  transform: translateZ(36px);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-tilt] .case-meta-bar,
+[data-tilt] .project-card-header,
+[data-tilt] .app-card-top-row {
+  transform: translateZ(18px);
+}
+
+/* Hero Portrait 3D Stereoscopic Holographic Window */
+.hero-visual-stage {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.stage-frame-outer {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stage-frame-inner {
+  transform-style: preserve-3d;
+}
+
+.hero-portrait-image {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-chip {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 3D Magnetic Interactive Buttons */
+.btn-magnetic {
+  transform-style: preserve-3d;
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 180ms ease;
+  will-change: transform;
+}
+
+.btn-magnetic > * {
+  transform: translateZ(8px);
+  pointer-events: none;
+}
+
 /* Reduced Motion Fallback */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -2764,5 +2934,9 @@ ul, ol {
   }
   .floating-chip {
     animation: none !important;
+  }
+  .hero-3d-canvas,
+  .schematic-3d-canvas {
+    display: none !important;
   }
 }

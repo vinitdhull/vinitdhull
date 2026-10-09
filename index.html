@@ -131,6 +131,7 @@
     <main id="top">
       <!-- 01 / HERO SECTION -->
       <section class="hero-section" aria-label="Introduction">
+        <canvas id="hero-3d-canvas" class="hero-3d-canvas" aria-hidden="true"></canvas>
         <div class="hero-ambient-glow" aria-hidden="true"></div>
         <div class="hero-grid-pattern" aria-hidden="true"></div>
 
@@ -498,6 +499,13 @@
                     <span class="terminal-title">SBI_RETAIL_LOANS // ARCHITECTURE_NODE</span>
                   </div>
                   <div class="schematic-body">
+                    <div class="schematic-3d-container">
+                      <canvas id="sbi-3d-canvas" class="schematic-3d-canvas" aria-label="Interactive 3D Banking Microservice Pipeline Topology"></canvas>
+                      <div class="canvas-3d-hint">
+                        <span class="hint-dot"></span>
+                        <span>Interactive 3D Pipeline · Move or Drag to Orbit</span>
+                      </div>
+                    </div>
                     <div class="schematic-stat">
                       <span class="stat-number">5+</span>
                       <span class="stat-caption">Loan Portfolios Orchestrated (Gold, RTXC, Personal, 2-Wheeler, Solar)</span>
