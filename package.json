@@ -5,6 +5,7 @@
   "description": "Professional profile website for Vinit Kumar Dhull",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "test": "node scripts/validate.mjs",
     "preview": "node scripts/preview.mjs"
   }
 }
