@@ -39,6 +39,11 @@
     <title>Vinit Kumar Dhull — Technology Leadership &amp; Engineering Delivery</title>
   </head>
   <body>
+    <!-- 3D Cursor & Interactive Sparks Canvas -->
+    <canvas id="cursor-sparks-canvas" class="cursor-sparks-canvas" aria-hidden="true"></canvas>
+    <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+    <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+
     <!-- Top Progress Bar -->
     <div class="scroll-progress-container" aria-hidden="true">
       <div class="scroll-progress-bar" id="scroll-progress"></div>
@@ -1060,9 +1065,16 @@
                 <span class="heading-accent">Deep Technical Execution.</span>
               </h2>
             </div>
-            <p class="capabilities-lead-copy">
-              A comprehensive view of proven engineering proficiencies, delivery frameworks, data systems, and enterprise architectural disciplines honed across 13+ years of production experience.
-            </p>
+            <div class="capabilities-3d-visual-wrap">
+              <canvas id="capabilities-3d-canvas" class="capabilities-3d-canvas" aria-label="Interactive 3D Engineering Architecture Hologram"></canvas>
+              <div class="capabilities-3d-hint">
+                <span class="hint-dot"></span>
+                <span>3D Polyhedral Core · Hover cards or drag to inspect</span>
+              </div>
+              <p class="capabilities-lead-copy">
+                A comprehensive view of proven engineering proficiencies, delivery frameworks, data systems, and enterprise architectural disciplines honed across 13+ years of production experience.
+              </p>
+            </div>
           </div>
 
           <div class="capabilities-dossier-grid">
@@ -1466,6 +1478,7 @@
 
       <!-- 08 / CONTACT SECTION -->
       <section class="editorial-contact-section" id="contact">
+        <canvas id="contact-3d-canvas" class="contact-3d-canvas" aria-hidden="true"></canvas>
         <div class="contact-ambient-radial" aria-hidden="true"></div>
         <div class="container contact-container">
           <div class="contact-box-content">

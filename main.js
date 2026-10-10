@@ -1274,40 +1274,547 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 13. 3D MAGNETIC INTERACTIVE BUTTONS
+  // 14. 3D CUSTOM CURSOR & INTERACTIVE SPARK TRAIL
   // =========================================================================
-  function initMagneticButtons() {
+  function init3DCursorAndSparks() {
     if (reduceMotion || !finePointer) return;
 
-    const magneticButtons = document.querySelectorAll(".btn-primary, .btn-secondary, .btn-hero-light");
+    const ring = document.querySelector("#cursor-ring");
+    const dot = document.querySelector("#cursor-dot");
+    const canvas = document.querySelector("#cursor-sparks-canvas");
+    if (!ring || !dot || !canvas) return;
 
-    magneticButtons.forEach((btn) => {
-      btn.classList.add("btn-magnetic");
-      let bounds = null;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-      btn.addEventListener("pointerenter", () => {
-        bounds = btn.getBoundingClientRect();
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    window.addEventListener("resize", () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }, { passive: true });
+
+    let targetX = -100;
+    let targetY = -100;
+    let ringX = -100;
+    let ringY = -100;
+
+    const sparks = [];
+    const MAX_SPARKS = 50;
+
+    function createSpark(x, y, speedMult = 1) {
+      if (sparks.length >= MAX_SPARKS) return;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (Math.random() * 2.4 + 0.8) * speedMult;
+      sparks.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 0.4,
+        radius: Math.random() * 2 + 1,
+        alpha: 1,
+        decay: Math.random() * 0.028 + 0.02,
+        color: Math.random() > 0.4 ? "56, 189, 248" : "96, 165, 250",
       });
+    }
 
-      btn.addEventListener("pointermove", (e) => {
-        if (!bounds) bounds = btn.getBoundingClientRect();
-        const x = e.clientX - bounds.left - bounds.width / 2;
-        const y = e.clientY - bounds.top - bounds.height / 2;
+    window.addEventListener("pointermove", (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
 
-        btn.style.transform = `translate3d(${x * 0.28}px, ${y * 0.28}px, 8px) rotateX(${-y * 0.08}deg) rotateY(${x * 0.08}deg)`;
+      dot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+
+      if (Math.random() < 0.25) {
+        createSpark(targetX, targetY, 0.7);
+      }
+    }, { passive: true });
+
+    window.addEventListener("pointerdown", (e) => {
+      for (let i = 0; i < 8; i++) {
+        createSpark(e.clientX, e.clientY, 1.9);
+      }
+    }, { passive: true });
+
+    const interactiveEls = document.querySelectorAll("a, button, [data-tilt], .carousel-slide, .dossier-card, .product-app-card");
+    interactiveEls.forEach((el) => {
+      el.addEventListener("pointerenter", () => ring.classList.add("active"));
+      el.addEventListener("pointerleave", () => ring.classList.remove("active"));
+    });
+
+    function cursorLoop() {
+      ringX += (targetX - ringX) * 0.18;
+      ringY += (targetY - ringY) * 0.18;
+
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vy += 0.035;
+        s.alpha -= s.decay;
+
+        if (s.alpha <= 0) {
+          sparks.splice(i, 1);
+          continue;
+        }
+
+        ctx.fillStyle = `rgba(${s.color}, ${s.alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      window.requestAnimationFrame(cursorLoop);
+    }
+
+    cursorLoop();
+  }
+
+  // =========================================================================
+  // 15. INTERACTIVE 3D CAPABILITIES POLYHEDRAL CORE HOLOGRAM
+  // =========================================================================
+  function initCapabilities3DCanvas() {
+    const canvas = document.querySelector("#capabilities-3d-canvas");
+    if (!canvas || reduceMotion) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let isVisible = true;
+    let animationFrameId = null;
+
+    let rotY = 0;
+    let rotX = 0.28;
+    let targetRotY = 0;
+    let targetRotX = 0.28;
+    let isDragging = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+    let highlightedIndex = -1;
+
+    const container = canvas.parentElement;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.scale(dpr, dpr);
+    }
+
+    window.addEventListener("resize", resize, { passive: true });
+    resize();
+
+    container.addEventListener("pointerdown", (e) => {
+      isDragging = true;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      container.setPointerCapture(e.pointerId);
+    });
+
+    container.addEventListener("pointermove", (e) => {
+      if (isDragging) {
+        const dx = e.clientX - lastPointerX;
+        const dy = e.clientY - lastPointerY;
+        targetRotY += dx * 0.012;
+        targetRotX = Math.max(-0.8, Math.min(0.8, targetRotX + dy * 0.012));
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+      }
+    });
+
+    function endDrag() {
+      isDragging = false;
+    }
+    container.addEventListener("pointerup", endDrag);
+    container.addEventListener("pointercancel", endDrag);
+
+    // 12 Vertices of an Icosahedron
+    const phi = (1 + Math.sqrt(5)) * 0.5;
+    const rawVertices = [
+      [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+      [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+      [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1]
+    ];
+
+    const ICOSA_RADIUS = 52;
+    const vertices = rawVertices.map(v => {
+      const len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+      return {
+        x: (v[0] / len) * ICOSA_RADIUS,
+        y: (v[1] / len) * ICOSA_RADIUS,
+        z: (v[2] / len) * ICOSA_RADIUS,
+      };
+    });
+
+    // Edges connecting vertices with distance threshold
+    const edges = [];
+    const edgeThreshold = ICOSA_RADIUS * 1.15;
+    for (let i = 0; i < vertices.length; i++) {
+      for (let j = i + 1; j < vertices.length; j++) {
+        const dx = vertices[i].x - vertices[j].x;
+        const dy = vertices[i].y - vertices[j].y;
+        const dz = vertices[i].z - vertices[j].z;
+        if (Math.sqrt(dx * dx + dy * dy + dz * dz) < edgeThreshold) {
+          edges.push([i, j]);
+        }
+      }
+    }
+
+    // 6 Orbiting Satellites matching the 6 Capability Domains
+    const satelliteCount = 6;
+    const satellites = [];
+    const SAT_RADIUS = 92;
+    for (let i = 0; i < satelliteCount; i++) {
+      const angle = (i * 2 * Math.PI) / satelliteCount;
+      satellites.push({
+        baseAngle: angle,
+        label: `0${i + 1}`,
       });
+    }
 
-      btn.addEventListener("pointerleave", () => {
-        btn.style.transform = "none";
-        bounds = null;
+    // Connect dossier card hover to 3D core
+    const dossierCards = document.querySelectorAll(".dossier-card");
+    dossierCards.forEach((card, idx) => {
+      card.addEventListener("pointerenter", () => {
+        highlightedIndex = idx;
+        targetRotY = (idx * Math.PI * 2) / satelliteCount + Math.PI;
+      });
+      card.addEventListener("pointerleave", () => {
+        highlightedIndex = -1;
       });
     });
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible && !animationFrameId) {
+          renderCore();
+        }
+      }, { threshold: 0.05 });
+      observer.observe(container);
+    }
+
+    let time = 0;
+
+    function renderCore() {
+      if (!isVisible) {
+        animationFrameId = null;
+        return;
+      }
+
+      time += 0.016;
+      if (!isDragging) {
+        targetRotY += 0.008;
+      }
+
+      rotY += (targetRotY - rotY) * 0.08;
+      rotX += (targetRotX - rotX) * 0.08;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width * 0.5;
+      const cy = height * 0.46;
+      const fov = 320;
+
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
+
+      function project(x, y, z) {
+        const x1 = x * cosY + z * sinY;
+        const z1 = -x * sinY + z * cosY;
+        const y1 = y * cosX - z1 * sinX;
+        const z2 = y * sinX + z1 * cosX;
+        const scale = fov / (fov + z2 + 180);
+        return {
+          x: cx + x1 * scale,
+          y: cy + y1 * scale,
+          z: z2,
+          scale,
+        };
+      }
+
+      // Projected vertices
+      const projV = vertices.map(v => project(v.x, v.y, v.z));
+
+      // Draw Edges
+      edges.forEach(([i, j]) => {
+        const p1 = projV[i];
+        const p2 = projV[j];
+        const avgZ = (p1.z + p2.z) * 0.5;
+        const alpha = Math.max(0.12, Math.min(0.85, (avgZ + 60) / 120));
+
+        ctx.strokeStyle = `rgba(56, 189, 248, ${alpha * 0.6})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      });
+
+      // Internal Glowing Core Orb
+      const corePulse = 18 + Math.sin(time * 3) * 3;
+      const coreProj = project(0, 0, 0);
+      const coreGrad = ctx.createRadialGradient(coreProj.x, coreProj.y, 0, coreProj.x, coreProj.y, corePulse * coreProj.scale * 2);
+      coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+      coreGrad.addColorStop(0.3, "rgba(56, 189, 248, 0.8)");
+      coreGrad.addColorStop(0.7, "rgba(37, 99, 235, 0.35)");
+      coreGrad.addColorStop(1, "rgba(37, 99, 235, 0)");
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(coreProj.x, coreProj.y, corePulse * coreProj.scale * 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Vertices
+      projV.forEach(p => {
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.6 * p.scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Orbiting Satellites
+      satellites.forEach((sat, idx) => {
+        const currentAngle = sat.baseAngle + time * 0.3;
+        const sx = Math.cos(currentAngle) * SAT_RADIUS;
+        const sz = Math.sin(currentAngle) * SAT_RADIUS;
+        const sy = Math.sin(time * 2 + idx) * 12;
+        const pSat = project(sx, sy, sz);
+
+        const isHighlighted = (highlightedIndex === idx);
+
+        // Ray connecting core to satellite
+        ctx.strokeStyle = isHighlighted ? "rgba(56, 189, 248, 0.8)" : "rgba(37, 99, 235, 0.25)";
+        ctx.lineWidth = isHighlighted ? 1.5 : 1;
+        ctx.beginPath();
+        ctx.moveTo(coreProj.x, coreProj.y);
+        ctx.lineTo(pSat.x, pSat.y);
+        ctx.stroke();
+
+        // Satellite Node
+        const satR = (isHighlighted ? 6 : 4) * pSat.scale;
+        ctx.fillStyle = isHighlighted ? "rgba(56, 189, 248, 1)" : "rgba(96, 165, 250, 0.8)";
+        ctx.beginPath();
+        ctx.arc(pSat.x, pSat.y, satR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(pSat.x, pSat.y, satR * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      animationFrameId = window.requestAnimationFrame(renderCore);
+    }
+
+    renderCore();
+  }
+
+  // =========================================================================
+  // 16. INTERACTIVE 3D CONTACT RADAR BEACON CANVAS
+  // =========================================================================
+  function initContact3DCanvas() {
+    const canvas = document.querySelector("#contact-3d-canvas");
+    if (!canvas || reduceMotion) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let isVisible = true;
+    let animationFrameId = null;
+
+    let targetRotX = 0.55;
+    let targetRotY = 0;
+    let rotX = 0.55;
+    let rotY = 0;
+
+    const container = canvas.parentElement;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.scale(dpr, dpr);
+    }
+
+    window.addEventListener("resize", resize, { passive: true });
+    resize();
+
+    container.addEventListener("pointermove", (e) => {
+      const rect = container.getBoundingClientRect();
+      const mx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      const my = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      targetRotY = mx * 0.4;
+      targetRotX = 0.55 - my * 0.2;
+    });
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible && !animationFrameId) {
+          renderBeacon();
+        }
+      }, { threshold: 0.05 });
+      observer.observe(container);
+    }
+
+    let time = 0;
+
+    function renderBeacon() {
+      if (!isVisible) {
+        animationFrameId = null;
+        return;
+      }
+
+      time += 0.016;
+
+      rotY += (targetRotY - rotY) * 0.05;
+      rotX += (targetRotX - rotX) * 0.05;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width * 0.76;
+      const cy = height * 0.5;
+      const fov = 350;
+
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
+
+      function project(x, y, z) {
+        const x1 = x * cosY + z * sinY;
+        const z1 = -x * sinY + z * cosY;
+        const y1 = y * cosX - z1 * sinX;
+        const z2 = y * sinX + z1 * cosX;
+        const scale = fov / (fov + z2 + 250);
+        return {
+          x: cx + x1 * scale,
+          y: cy + y1 * scale,
+          z: z2,
+          scale,
+        };
+      }
+
+      // 4 Concentric 3D Perspective Elliptical Rings
+      const ringRadii = [60, 110, 165, 230];
+      ringRadii.forEach((r, idx) => {
+        const ringAlpha = 0.28 - idx * 0.05;
+        ctx.strokeStyle = `rgba(56, 189, 248, ${ringAlpha})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        const SEGMENTS = 48;
+        for (let i = 0; i <= SEGMENTS; i++) {
+          const a = (i / SEGMENTS) * Math.PI * 2;
+          const px = Math.cos(a) * r;
+          const pz = Math.sin(a) * r;
+          const py = Math.sin(a * 3 + time * 2) * 6;
+          const p = project(px, py, pz);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+
+        // Orbiting Satellite on each ring
+        const satA = time * (0.8 - idx * 0.15) + (idx * Math.PI) / 2;
+        const satP = project(Math.cos(satA) * r, 0, Math.sin(satA) * r);
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(satP.x, satP.y, 2.8 * satP.scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(56, 189, 248, 0.4)";
+        ctx.beginPath();
+        ctx.arc(satP.x, satP.y, 6 * satP.scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Expanding 3D Pulse Waves
+      const pulseT = (time * 0.6) % 1;
+      const pulseR = pulseT * 260;
+      const pulseAlpha = (1 - pulseT) * 0.35;
+      ctx.strokeStyle = `rgba(56, 189, 248, ${pulseAlpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const SEGMENTS = 48;
+      for (let i = 0; i <= SEGMENTS; i++) {
+        const a = (i / SEGMENTS) * Math.PI * 2;
+        const p = project(Math.cos(a) * pulseR, 0, Math.sin(a) * pulseR);
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+
+      animationFrameId = window.requestAnimationFrame(renderBeacon);
+    }
+
+    renderBeacon();
+  }
+
+  // =========================================================================
+  // 17. ANIMATED PROOF METRIC COUNTERS
+  // =========================================================================
+  function initProofMetricCounters() {
+    const proofValues = document.querySelectorAll(".proof-value");
+    if (proofValues.length === 0 || reduceMotion) return;
+
+    let hasAnimated = false;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasAnimated) {
+        hasAnimated = true;
+        proofValues.forEach((el) => {
+          const target = parseInt(el.textContent.trim(), 10) || 0;
+          if (target <= 0) return;
+          let current = 0;
+          const duration = 1200;
+          const stepTime = 25;
+          const steps = duration / stepTime;
+          const increment = target / steps;
+
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              el.textContent = target;
+              clearInterval(timer);
+            } else {
+              el.textContent = Math.floor(current);
+            }
+          }, stepTime);
+        });
+      }
+    }, { threshold: 0.3 });
+
+    const proofRibbon = document.querySelector(".proof-ribbon");
+    if (proofRibbon) observer.observe(proofRibbon);
   }
 
   // Initialize All 3D Motion Subsystems
   initHero3DCanvas();
   initSBI3DCanvas();
   initGlobe3DCanvas();
+  initCapabilities3DCanvas();
+  initContact3DCanvas();
   initAdvanced3DTilt();
   initMagneticButtons();
+  init3DCursorAndSparks();
+  initProofMetricCounters();
 });
